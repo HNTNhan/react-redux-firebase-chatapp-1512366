@@ -28,6 +28,7 @@ body {
 .page {
     clear: both;
 }
+
 .signin {
     margin: 0 auto;
     width: 750px;
@@ -41,13 +42,25 @@ body {
     background: #444753;
     border-radius: 5px;
 }
-
+.avatar{
+    float: left;
+    width: 50px;
+    border-radius: 55px;
+    margin-right: 5px;
+}
 .people-list {
     width:260px;
     float: left;
 
     .search {
         padding: 20px;
+    }
+
+    .button-list {
+        width: 200px;
+        background: #444753;
+        border: none;
+        color: white;
     }
 
     input {
@@ -66,28 +79,16 @@ body {
     }
 
     ul {
+        list-style-type: none;
         padding: 20px;
         height: 770px;
         li {
-            padding-bottom: 20px;
+            padding-bottom: 10px;
         }
     }
 
-    img {
-        float: left;
-    }
-
     .about {
-        float: left;
         margin-top: 8px;
-    }
-
-    .about {
-        padding-left: 8px;
-    }
-
-    .status {
-        color: $gray;
     }
 
 }
@@ -207,7 +208,7 @@ body {
 
         }
 
-        button {
+        .send {
             float: right;
             color: $blue;
             font-size: 16px;
@@ -225,8 +226,8 @@ body {
 }
 
 .online, .offline, .me {
-    margin-right: 3px;
-    font-size: 10px;
+    margin-top: 2px;
+    font-size: 14px;
 }
 
 .online {

@@ -1,32 +1,95 @@
 import React, {Component} from 'react';
 import {compose} from "redux";
-import {firebaseConnect, getVal,  isLoaded, isEmpty} from "react-redux-firebase";
+import {withFirebase, firebaseConnect, isLoaded, isEmpty} from "react-redux-firebase";
 import connect from "react-redux/es/connect/connect";
 import * as routes from "../constants/routes";
-import enhance from "./users"
+
 const mapStateToProps = state => {
-    return { auth: state.reducers.auth };
+    return { Auth: state.reducers.auth };
 };
 
 class Homepage extends Component {
-    state = {
-        users: []
-    };
+    constructor(props) {
+        super(props);
+        this.state = {
+            users: [],
+            chatWith: null,
+        };
+        this.sendMessage =this.sendMessage.bind(this);
+        this.selectToChat = this.selectToChat.bind(this);
+    }
 
     componentWillMount() {
-        if(!this.props.auth){
+        if(!this.props.Auth){
             this.props.history.push(routes.SIGN_IN);
         }
+        this.setState({
+            users: this.props.users
+        });
+    }
 
+    sendMessage() {
+        
+    }
+
+    selectToChat(key) {
+        for(let i = 0; i < this.props.users.length; i++) {
+            if(this.props.users[i].key === key.key) {
+                this.setState({
+                    chatWith: this.props.users[i]
+                });
+                break;
+            }
+        }
     }
 
     render() {
         let users = [];
-        if(isLoaded(this.props.users)){
-            if(!isEmpty(this.props.users)) {
-                Object.keys(this.props.users).map(
-                    (key) => (
-                        users = users.concat(key)
+        let chatWith = <div className="chat-header clearfix"> </div>;
+        if(this.state.chatWith !== null) {
+            chatWith= <div className="chat-header clearfix">
+                <img className="avatar"
+                     src={this.state.chatWith.value.avatarUrl}
+                     alt="avatar"/>
+                <div className="chat-about">
+                    <div className="chat-with">Chat with {this.state.chatWith.value.displayName}</div>
+                    <div className="chat-num-messages">already 1 902 messages</div>
+                </div>
+                <i className="fa fa-star"/>
+            </div>;
+        }
+        if(isLoaded(this.props.users && this.props.presence)){
+            if(!isEmpty(this.props.users && this.props.presence)) {
+                for(let i = 0; i < this.props.users.length; i++) {
+                    this.props.users[i] = Object.assign(this.props.users[i], {status: "offline"});
+                    if(this.props.users[i].key === this.props.presence[0].key) {
+                        this.props.users[i].status = "me";
+                        continue;
+                    }
+                    for(let j = 0; j < this.props.presence.length; j++) {
+                        if(this.props.presence[j].key === this.props.users[i].key)
+                            this.props.users[i].status = "online";
+                    }
+                }
+                this.props.users.map((key) => (
+                        users = users.concat(
+                            <button
+                                className="button-list"
+                                key={key.key}
+                                onClick={() => this.selectToChat(key)}>
+                                <li className="clearfix">
+                                    <img className="avatar"
+                                         src={key.value.avatarUrl}
+                                         alt="avatar"/>
+                                    <div className="about">
+                                        <div className="name">{key.value.displayName}</div>
+                                        <div className={key.status}>
+                                            <i className="fa fa-circle online"/> {key.status}
+                                        </div>
+                                    </div>
+                                </li>
+                            </button>
+                        )
                     )
                 );
             }
@@ -41,64 +104,12 @@ class Homepage extends Component {
                             <i className="fa fa-search"/>
                         </div>
                         <ul className="list">
-                            <li className="clearfix">
-                                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01.jpg"
-                                     alt="avatar"/>
-                                <div className="about">
-                                    <div className="name">Vincent Porter</div>
-                                    <div className="status">
-                                        <i className="fa fa-circle online"/> online
-                                    </div>
-                                </div>
-                            </li>
-
-                            <li className="clearfix">
-                                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_02.jpg"
-                                     alt="avatar"/>
-                                <div className="about">
-                                    <div className="name">Aiden Chavez</div>
-                                    <div className="status">
-                                        <i className="fa fa-circle offline"/> left 7 mins ago
-                                    </div>
-                                </div>
-                            </li>
-
-                            <li className="clearfix">
-                                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_03.jpg"
-                                     alt="avatar"/>
-                                <div className="about">
-                                    <div className="name">Mike Thomas</div>
-                                    <div className="status">
-                                        <i className="fa fa-circle online"/> online
-                                    </div>
-                                </div>
-                            </li>
-
-                            <li className="clearfix">
-                                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_04.jpg"
-                                     alt="avatar"/>
-                                <div className="about">
-                                    <div className="name">Erica Hughes</div>
-                                    <div className="status">
-                                        <i className="fa fa-circle online"/> online
-                                    </div>
-                                </div>
-                            </li>
+                            {users}
                         </ul>
                     </div>
 
                     <div className="chat">
-                        <div className="chat-header clearfix">
-                            <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01_green.jpg"
-                                 alt="avatar"/>
-
-                            <div className="chat-about">
-                                <div className="chat-with">Chat with Vincent Porter</div>
-                                <div className="chat-num-messages">already 1 902 messages</div>
-                            </div>
-                            <i className="fa fa-star"/>
-                        </div>
-
+                        {chatWith}
                         <div className="chat-history">
                             <ul>
                                 <li className="clearfix">
@@ -165,8 +176,7 @@ class Homepage extends Component {
                             <textarea name="message-to-send" id="message-to-send" placeholder="Type your message" rows="3"/>
                             <i className="fa fa-file-o"/> &nbsp;&nbsp;&nbsp;
                             <i className="fa fa-file-image-o"/>
-
-                            <button>Send</button>
+                            <button className="send" onClick={this.sendMessage}>Send</button>
                         </div>
                     </div>
                 </div>
@@ -179,9 +189,11 @@ export default compose(
     firebaseConnect([
         'presence',  'users'
     ]),
+    connect(({ firebase: { auth } }) => ({ auth })),
     connect((state) => ({
-        presence: state.firebase.data.presence,// profile: state.firebase.profile // load profile
-        users: state.firebase.data.users,
+        withFirebase,
+        presence: state.firebase.ordered.presence,// profile: state.firebase.profile // load profile
+        users: state.firebase.ordered.users,
     })),
     connect(mapStateToProps),
 )(Homepage)
