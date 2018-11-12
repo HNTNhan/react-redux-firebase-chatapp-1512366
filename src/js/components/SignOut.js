@@ -22,7 +22,6 @@ class SignOutButton extends Component {
         const bool = false;
         this.props.firebase.logout().then(()=>{
             this.props.auth(bool);
-            //this.props.history.push(routes.SIGN_IN);
         });
     }
 

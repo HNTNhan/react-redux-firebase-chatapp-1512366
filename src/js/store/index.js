@@ -1,6 +1,6 @@
 import rootReducer from "../reducers/index";
 import { createStore, compose } from 'redux'
-import { reactReduxFirebase, firebaseReducer } from 'react-redux-firebase'
+import { reactReduxFirebase } from 'react-redux-firebase'
 import firebase from 'firebase'
 
 const firebaseConfig = {

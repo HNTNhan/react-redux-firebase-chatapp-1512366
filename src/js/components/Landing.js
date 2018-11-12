@@ -21,7 +21,7 @@ class Landing extends Component {
                     this.props.history.push(routes.HOME);
                 }
             }
-        }, 800)
+        }, 1000)
     }
 
     render() {
