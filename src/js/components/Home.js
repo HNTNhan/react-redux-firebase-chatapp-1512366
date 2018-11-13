@@ -120,10 +120,12 @@ class Homepage extends Component {
 
                 for(let i = 0; i < this.props.users.length; i++) {
                     this.props.users[i] = Object.assign(this.props.users[i], {status: "offline", star: false});
-                    for(let j = 0; j < stars.length; j++) {
-                        if(this.props.users[i].key === stars[j]) {
-                            this.props.users[i].star = true;
-                            break;
+                    if (stars !== undefined) {
+                        for(let j = 0; j < stars.length; j++) {
+                            if(this.props.users[i].key === stars[j]) {
+                                this.props.users[i].star = true;
+                                break;
+                            }
                         }
                     }
                     if(this.props.users[i].key === this.props.auth.uid) {
@@ -365,7 +367,7 @@ class Homepage extends Component {
                     <div className="people-list" id="people-list">
                         <div className="search">
                             <input type="text"
-                                   placeholder="search"
+                                   placeholder="Search"
                                    name="search"
                                    id="search"
                                    onChange={this.searchUser}/>
@@ -392,7 +394,7 @@ class Homepage extends Component {
                                         <i className="fa fa-file-o"/> &nbsp;&nbsp;&nbsp;
                                         <i className="fa fa-file-image-o"/>
                                         <button className="send" onClick={this.sendMessage}>Send Message</button>
-                                        <button className="send_image" onClick={this.sendMessage}>Image</button>
+                                        <button className="send_image" onClick={this.sendMessage}>Send Image</button>
                                     </div>:
                                     <div className="chat-message clearfix">  </div>
                             }

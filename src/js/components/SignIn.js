@@ -41,9 +41,8 @@ class SignInPage extends Component{
     render() {
         return (
             <div className="signin page">
-                <p>Please Sign In</p>
-                <button onClick={this.Login}>Sign In With Google</button>
-                <p>Don't have an account?<Link to={routes.LANDING}>{" "}Sign Up</Link> </p>
+                <h2>Please Sign In</h2>
+                <button style={{fontSize: 16}} onClick={this.Login}>Sign In With Google</button>
             </div>
         );
     }

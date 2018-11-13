@@ -10,27 +10,48 @@ $gray: #92959E;
 }
 
 body {
-    background: #C5DDEB;
+    background: #4d94ff;
     font: 14px/20px "Lato", Arial, sans-serif;
     padding: 5px 0;
     color: white;
 }
 .title {
+  text-align: center;
     color: black;
 }
 .navigation {
     margin: 0 auto;
     width: 500px;
     text-align: center;
-    background: #C5DDEB;
+    background: #4d94ff;
     clear: both;
 }
+.navigation_item {
+    margin: 5px;
+    color: white;
+    text-align: center;
+    background: #4d94ff;
+    border: none;
+    :active {
+      color: white;
+    }
+    :hover {
+      color: #039be5;
+    }
+    :focus {
+      color: #039be5;
+    }
+    :visited {
+      color: white;
+    }
+}
+
 .page {
     clear: both;
 }
 
 .signin {
-    margin: 0 auto;
+    margin: 10% auto;
     width: 750px;
     text-align: center;
     color: black;
@@ -57,28 +78,32 @@ body {
 
 
 .people-list {
-    width:260px;
+    width: 260px;
     float: left;
+    overflow-y: visible;
 
     .search {
         color: white;
-        padding: 20px;
+        padding: 20px 20px;
         ::placeholder {
           color: #cccccc;
-          opacity: 1;
+          opacity: 0.8;
         }
     }
 
     .button-list {
         float: left;
-        width: 200px;
+        text-align: left;
+        width: 180px;
         background: #444753;
         border: none;
         color: white;
     }
 
-    .button-star {
-        width: 10px;
+    .image-star {
+        margin-left: 5px;
+        margin-top: 10%;
+        width: 16px;
         float: left;
         background: #444753;
         border: none;
@@ -120,11 +145,11 @@ body {
 .chat {
     width: 490px;
     float:left;
-    background: #F2F5F8;
+    background: #ccd9ff;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
-
     color: #434651;
+
 
     .chat-header {
         padding: 20px;
@@ -159,7 +184,7 @@ body {
 
     .chat-history {
         padding: 30px 30px 20px;
-        border-bottom: 2px solid white;
+        border-bottom: 4px solid white;
         overflow-y: scroll;
         height: 450px;
 
@@ -168,7 +193,7 @@ body {
         }
 
         .message-data-time {
-            color: lighten($gray, 8%);
+            color: lighten($gray, 10%);
             padding-left: 6px;
         }
 
@@ -202,7 +227,7 @@ body {
         }
 
         .other-message {
-            background: $blue;
+            background: #1db1fc;
 
             &:after {
                 border-bottom-color: $blue;
@@ -235,33 +260,33 @@ body {
 
         .send {
             float: right;
-          color: #039be5;
+            color: #039be5;
             font-size: 16px;
             text-transform: uppercase;
             border: none;
             cursor: pointer;
             font-weight: bold;
-            background: #F2F5F8;
+            background: #ccd9ff;
 
             &:hover {
               color: darken(#039be5, 20%);
             }
         }
 
-      .send_image {
-        float: left;
-        color: #039be5;
-        font-size: 16px;
-        text-transform: uppercase;
-        border: none;
-        cursor: pointer;
-        font-weight: bold;
-        background: #F2F5F8;
+        .send_image {
+          float: left;
+          color: #039be5;
+          font-size: 16px;
+          text-transform: uppercase;
+          border: none;
+          cursor: pointer;
+          font-weight: bold;
+          background: #ccd9ff;
 
-          &:hover {
-            color: darken(#039be5, 20%);
-          }
-      }
+            &:hover {
+              color: darken(#039be5, 20%);
+            }
+        }
     }
 }
 

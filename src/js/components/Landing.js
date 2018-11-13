@@ -27,7 +27,7 @@ class Landing extends Component {
     render() {
         return (
             <div className="title">
-                <h1>Landing</h1>
+                <img style={{width: 600}} src={require("../../image/landing.png")} alt="landing"/>
             </div>
         );
     }

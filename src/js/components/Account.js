@@ -20,6 +20,8 @@ class Account extends Component {
         return (
             <div className="title">
                 <h1>Account</h1>
+                <h2> In Progress...</h2>
+                <h2>Please come back later.</h2>
             </div>
         );
     }
