@@ -53,7 +53,12 @@ body {
     float: left;
 
     .search {
+        color: white;
         padding: 20px;
+        ::placeholder {
+          color: #cccccc;
+          opacity: 1;
+        }
     }
 
     .button-list {
@@ -81,7 +86,7 @@ body {
     ul {
         list-style-type: none;
         padding: 20px;
-        height: 770px;
+        height: 600px;
         li {
             padding-bottom: 10px;
         }
@@ -137,7 +142,7 @@ body {
         padding: 30px 30px 20px;
         border-bottom: 2px solid white;
         overflow-y: scroll;
-        height: 575px;
+        height: 450px;
 
         .message-data {
             margin-bottom: 15px;

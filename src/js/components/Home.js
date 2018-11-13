@@ -12,20 +12,25 @@ class Homepage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            users: [],
+            search: "",
             chatWith: null,
             chatBetween: "",
         };
         this.sendMessage =this.sendMessage.bind(this);
         this.selectToChat = this.selectToChat.bind(this);
+        this.searchUser = this.searchUser.bind(this);
     }
 
     componentWillMount() {
         if(!this.props.Auth){
             this.props.history.push(routes.SIGN_IN);
         }
+    }
+
+    searchUser(event) {
+        const search = event.target.value;
         this.setState({
-            users: this.props.users
+            search: search
         });
     }
 
@@ -54,7 +59,9 @@ class Homepage extends Component {
                     }
                 }
                 if(chatBetween === "") chatBetween = this.props.auth.uid + "-" + this.props.users[i].key;
+                document.getElementById("search").value = "";
                 this.setState({
+                    search: "",
                     chatBetween: chatBetween,
                     chatWith: this.props.users[i]
                 });
@@ -62,6 +69,7 @@ class Homepage extends Component {
             }
         }
     }
+
     scrollToBottom = () => {
         this.messagesEnd.scrollIntoView({ behavior: "smooth" });
     };
@@ -74,7 +82,7 @@ class Homepage extends Component {
     render() {
         let users = [];
         let user;
-        let messagehistory = [];
+        let historymessage = [];
         let chatWith = <div className="chat-header clearfix"> </div>;
         if(isLoaded(this.props.users && this.props.presence && this.props.messages)){
             if(!isEmpty(this.props.users && this.props.presence && this.props.messages)) {
@@ -90,7 +98,70 @@ class Homepage extends Component {
                             this.props.users[i].status = "online";
                     }
                 }
+
+                //Sap xep people list
+                let people_list = [];
+                for(let j = 0; j < this.props.messages.length; j++) {
+                    const id = this.props.messages[j].key.split("-");
+                    if(this.props.auth.uid === id[0]) {
+                        let tmessage_id = Object.keys(this.props.messages[j].value);
+                        const people = {
+                            id:  id[1],
+                            createdAt: this.props.messages[j].value[tmessage_id[tmessage_id.length-1]].createdAt,
+                        };
+                        people_list = people_list.concat(people);
+                    }
+                    else if (this.props.auth.uid === id[1]) {
+                        let tmessage_id = Object.keys(this.props.messages[j].value);
+                        const people = {
+                            id:  id[0],
+                            createdAt: this.props.messages[j].value[tmessage_id[tmessage_id.length-1]].createdAt,
+                        };
+                        people_list = people_list.concat(people);
+                    }
+                }
+                for(let i = 0; i < people_list.length - 1; i++) {
+                    for(let j = i + 1; j < people_list.length; j++) {
+                        if(people_list[j].createdAt > people_list[i].createdAt) {
+                            const temp = people_list[i];
+                            people_list[i] = people_list[j];
+                            people_list[j] = temp;
+                        }
+                    }
+                }
+
+                for(let i = 0; i < people_list.length; i++) {
+                    for(let j = i; j < this.props.users.length; j++) {
+                        if(people_list[i].id === this.props.users[j].key) {
+                            const temp = this.props.users[i];
+                            this.props.users[i] = this.props.users[j];
+                            this.props.users[j] = temp;
+                        }
+                    }
+                }
+
+                //tao people list
                 this.props.users.map((key) => (
+                    (this.state.search==="") ?
+                        users = users.concat(
+                            <button
+                                className="button-list"
+                                key={key.key}
+                                onClick={() => this.selectToChat(key)}>
+                                <li className="clearfix">
+                                    <img className="avatar"
+                                         src={key.value.avatarUrl}
+                                         alt="avatar"/>
+                                    <div className="about">
+                                        <div className="name">{key.value.displayName}</div>
+                                        <div className={key.status}>
+                                            <i className="fa fa-circle online"/> {key.status}
+                                        </div>
+                                    </div>
+                                </li>
+                            </button>
+                        ) :
+                        (key.value.displayName.indexOf(this.state.search) === -1)? "" :
                         users = users.concat(
                             <button
                                 className="button-list"
@@ -136,12 +207,13 @@ class Homepage extends Component {
                     break;
                 }
             }
-            for(let i = (message_id.length>20) ? message_id.length-20: 0; i < message_id.length; i++) {
-                if(messagehistory.length >= 20) break;
+
+            for(let i = (message_id.length>50) ? message_id.length-50: 0; i < message_id.length; i++) {
+                if(historymessage.length >= 50) break;
                 const timestamp = this.props.messages[stt_message].value[message_id[i]].createdAt;
                 if(this.props.messages[stt_message].value[message_id[i]].createdBy === this.props.auth.uid)
                 {
-                    messagehistory = messagehistory.concat(
+                    historymessage = historymessage.concat(
                         <li className="clearfix" key={i}>
                             <div className="message-data align-right">
                             <span className="message-data-time">
@@ -160,7 +232,7 @@ class Homepage extends Component {
                     )
                 }
                 else {
-                    messagehistory = messagehistory.concat(
+                    historymessage = historymessage.concat(
                         <li key={i}>
                             <div className="message-data">
                                 <span className="message-data-name"><i className="fa fa-circle online"/>
@@ -188,7 +260,11 @@ class Homepage extends Component {
                 <div className="container clearfix">
                     <div className="people-list" id="people-list">
                         <div className="search">
-                            <input type="text" placeholder="search"/>
+                            <input type="text"
+                                   placeholder="search"
+                                   name="search"
+                                   id="search"
+                                   onChange={this.searchUser}/>
                             <i className="fa fa-search"/>
                         </div>
                         <ul className="list">
@@ -200,19 +276,20 @@ class Homepage extends Component {
                         {chatWith}
                         <div className="chat-history">
                             <ul>
-                                {messagehistory}
+                                {historymessage}
                             </ul>
+                            <div ref={(el) => { this.messagesEnd = el; }}> </div>
                         </div>
                             {
                                 (this.state.chatWith) ?
-                                    <div className="chat-message clearfix" ref={(el) => { this.messagesEnd = el; }}>
-                                        <textarea name="message-to-send" id="message-to-send" placeholder="Type your message" rows="3"/>
+                                    <div className="chat-message clearfix">
+                                        <textarea name="message-to-send" id="message-to-send"
+                                                  placeholder="Type your message" rows="2"/>
                                         <i className="fa fa-file-o"/> &nbsp;&nbsp;&nbsp;
                                         <i className="fa fa-file-image-o"/>
                                         <button className="send" onClick={this.sendMessage}>Send</button>
                                     </div>:
-                                    <div className="chat-message clearfix" ref={(el) => { this.messagesEnd = el; }}>  </div>
-
+                                    <div className="chat-message clearfix">  </div>
                             }
 
                     </div>
