@@ -199,7 +199,7 @@ class Homepage extends Component {
                         }
                     }
                 }
-                
+
                 vt = numberstar;
                 for(let i = 0; i < people_list.length; i++) {
                     for(let j = vt; j < this.props.users.length; j++) {
@@ -314,7 +314,19 @@ class Homepage extends Component {
                                 className="fa fa-circle me"/>
                             </div>
                             <div className="message other-message float-right">
-                                {this.props.messages[stt_message].value[message_id[i]].content}
+                                {
+                                    (this.props.messages[stt_message].value[message_id[i]].content.indexOf("http") ===-1)
+                                    ? this.props.messages[stt_message].value[message_id[i]].content
+                                    :   <div>
+                                            <img style={{width: 200}}
+                                                 src={this.props.messages[stt_message].value[message_id[i]].content}
+                                                 alt="">
+                                            </img>
+                                            <a href={this.props.messages[stt_message].value[message_id[i]].content} target="_blank">
+                                                {this.props.messages[stt_message].value[message_id[i]].content}
+                                            </a>
+                                        </div>
+                                }
                             </div>
                         </li>
                     )
@@ -334,6 +346,10 @@ class Homepage extends Component {
                                 </span>
                             </div>
                             <div className="message my-message">
+                                <img style={{height: 30, width: 30}}
+                                     src={this.props.messages[stt_message].value[message_id[i]].content}
+                                     alt="">
+                                </img>
                                 {this.props.messages[stt_message].value[message_id[i]].content}
                             </div>
                         </li>
@@ -375,7 +391,8 @@ class Homepage extends Component {
                                                   placeholder="Type your message" rows="2"/>
                                         <i className="fa fa-file-o"/> &nbsp;&nbsp;&nbsp;
                                         <i className="fa fa-file-image-o"/>
-                                        <button className="send" onClick={this.sendMessage}>Send</button>
+                                        <button className="send" onClick={this.sendMessage}>Send Message</button>
+                                        <button className="send_image" onClick={this.sendMessage}>Image</button>
                                     </div>:
                                     <div className="chat-message clearfix">  </div>
                             }

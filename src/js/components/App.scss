@@ -181,6 +181,7 @@ body {
             margin-bottom: 30px;
             width: 90%;
             position: relative;
+            word-wrap: break-word;
 
             &:after {
                 bottom: 100%;
@@ -234,7 +235,7 @@ body {
 
         .send {
             float: right;
-            color: $blue;
+          color: #039be5;
             font-size: 16px;
             text-transform: uppercase;
             border: none;
@@ -243,9 +244,24 @@ body {
             background: #F2F5F8;
 
             &:hover {
-                color: darken($blue, 7%);
+              color: darken(#039be5, 20%);
             }
         }
+
+      .send_image {
+        float: left;
+        color: #039be5;
+        font-size: 16px;
+        text-transform: uppercase;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        background: #F2F5F8;
+
+          &:hover {
+            color: darken(#039be5, 20%);
+          }
+      }
     }
 }
 
