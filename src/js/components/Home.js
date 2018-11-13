@@ -19,12 +19,34 @@ class Homepage extends Component {
         this.sendMessage =this.sendMessage.bind(this);
         this.selectToChat = this.selectToChat.bind(this);
         this.searchUser = this.searchUser.bind(this);
+        this.star = this.star.bind(this);
     }
 
     componentWillMount() {
         if(!this.props.Auth){
             this.props.history.push(routes.SIGN_IN);
         }
+    }
+
+    star(id) {
+        let star_user = [];
+        for(let i = 0; i < this.props.users.length; i++) {
+            if (this.props.users[i].star === true) star_user = star_user.concat(this.props.users[i].key);
+        }
+        const link_star = "star/" + this.props.auth.uid;
+        for (let i =0; i < star_user.length; i++) {
+            if(star_user[i] === this.props.users[id].key) {
+                star_user.splice(i, 1);
+                this.props.firebase.push(link_star, star_user);
+                this.props.users[id].star = false;
+                if(star_user.length === 0) this.props.firebase.push(link_star, "");
+                return
+            }
+        }
+        this.props.users[id].star = true;
+        star_user = star_user.concat(this.props.users[id].key);
+        this.props.firebase.push(link_star, star_user);
+        //this.forceUpdate();
     }
 
     searchUser(event) {
@@ -84,23 +106,42 @@ class Homepage extends Component {
         let user;
         let historymessage = [];
         let chatWith = <div className="chat-header clearfix"> </div>;
-        if(isLoaded(this.props.users && this.props.presence && this.props.messages)){
-            if(!isEmpty(this.props.users && this.props.presence && this.props.messages)) {
+        if(isLoaded(this.props.users && this.props.presence && this.props.messages && this.props.star)){
+            if(!isEmpty(this.props.users && this.props.presence && this.props.messages && this.props.star)) {
+                let ids;
+                let stars;
+                for (let i = 0; i < this.props.star.length; i++) {
+                    if(this.props.star[i].key === this.props.auth.uid) {
+                        ids = Object.keys(this.props.star[i].value);
+                        stars = this.props.star[i].value[ids[ids.length-1]];
+                        break;
+                    }
+                }
+
                 for(let i = 0; i < this.props.users.length; i++) {
-                    this.props.users[i] = Object.assign(this.props.users[i], {status: "offline"});
+                    this.props.users[i] = Object.assign(this.props.users[i], {status: "offline", star: false});
+                    for(let j = 0; j < stars.length; j++) {
+                        if(this.props.users[i].key === stars[j]) {
+                            this.props.users[i].star = true;
+                            break;
+                        }
+                    }
                     if(this.props.users[i].key === this.props.auth.uid) {
                         this.props.users[i].status = "me";
                         user = this.props.users[i];
                         continue;
                     }
                     for(let j = 0; j < this.props.presence.length; j++) {
-                        if(this.props.presence[j].key === this.props.users[i].key)
+                        if(this.props.presence[j].key === this.props.users[i].key){
                             this.props.users[i].status = "online";
+                            break;
+                        }
                     }
                 }
 
                 //Sap xep people list
                 let people_list = [];
+                //Dua doi tuong chua id va thoi gian chat vao people_list
                 for(let j = 0; j < this.props.messages.length; j++) {
                     const id = this.props.messages[j].key.split("-");
                     if(this.props.auth.uid === id[0]) {
@@ -120,6 +161,7 @@ class Homepage extends Component {
                         people_list = people_list.concat(people);
                     }
                 }
+                //Sap xep list theo thoi gian
                 for(let i = 0; i < people_list.length - 1; i++) {
                     for(let j = i + 1; j < people_list.length; j++) {
                         if(people_list[j].createdAt > people_list[i].createdAt) {
@@ -129,64 +171,109 @@ class Homepage extends Component {
                         }
                     }
                 }
-
-                for(let i = 0; i < people_list.length; i++) {
-                    for(let j = i; j < this.props.users.length; j++) {
-                        if(people_list[i].id === this.props.users[j].key) {
-                            const temp = this.props.users[i];
-                            this.props.users[i] = this.props.users[j];
-                            this.props.users[j] = temp;
+                let numberstar = 0;
+                //Sap xep cac nguoi dung co star len dau
+                for(let i = 0; i < this.props.users.length; i++) {
+                    if(this.props.users[i].star === true) { numberstar++; continue; }
+                    for(let j = i + 1; j < this.props.users.length; j++) {
+                        if(this.props.users[j].star === true) {
+                            numberstar++;
+                            const temp = this.props.users[j];
+                            this.props.users[j] = this.props.users[i];
+                            this.props.users[i] = temp;
+                            break;
                         }
                     }
                 }
 
+                let vt = 0;
+                //Sap xep danh sap nguoi dung danh sach cac doi tuong da tao.
+                for(let i = 0; i < people_list.length - 1; i++) {
+                    for(let j = vt; j < numberstar; j++) {
+                        if(this.props.users[j].key === people_list[i].id) {
+                            const temp = this.props.users[j];
+                            this.props.users[j] = this.props.users[vt];
+                            this.props.users[vt] = temp;
+                            vt++;
+                            break;
+                        }
+                    }
+                }
+                
+                vt = numberstar;
+                for(let i = 0; i < people_list.length; i++) {
+                    for(let j = vt; j < this.props.users.length; j++) {
+                        if(this.props.users[j].key === people_list[i].id) {
+                            const temp = this.props.users[j];
+                            this.props.users[j] = this.props.users[vt];
+                            this.props.users[vt] = temp;
+                            vt++;
+                            break;
+                        }
+                    }
+                }
+
+
+
                 //tao people list
-                this.props.users.map((key) => (
+                this.props.users.map((key, id) => (
                     (this.state.search==="") ?
                         users = users.concat(
-                            <button
-                                className="button-list"
-                                key={key.key}
-                                onClick={() => this.selectToChat(key)}>
-                                <li className="clearfix">
-                                    <img className="avatar"
-                                         src={key.value.avatarUrl}
-                                         alt="avatar"/>
-                                    <div className="about">
-                                        <div className="name">{key.value.displayName}</div>
-                                        <div className={key.status}>
-                                            <i className="fa fa-circle online"/> {key.status}
+                            <div key={key.key}>
+                                <button
+                                    className="button-list"
+                                    onClick={() => this.selectToChat(key)}>
+                                    <li className="clearfix">
+                                        <img className="avatar"
+                                             src={key.value.avatarUrl}
+                                             alt="avatar"/>
+                                        <div className="about">
+                                            <div className="name">{key.value.displayName}</div>
+                                            <div className={key.status}>
+                                                <i className="fa fa-circle online"/> {key.status}
+                                            </div>
                                         </div>
-                                    </div>
-                                </li>
-                            </button>
+                                    </li>
+                                </button>
+                                <img className="image-star"
+                                     src={(key.star) ? require("../../image/Star Filled.png"): require("../../image/Star.png")}
+                                     alt="star"
+                                     onClick={()=>this.star(id)}
+                                />
+                            </div>
                         ) :
                         (key.value.displayName.indexOf(this.state.search) === -1)? "" :
                         users = users.concat(
-                            <button
-                                className="button-list"
-                                key={key.key}
-                                onClick={() => this.selectToChat(key)}>
-                                <li className="clearfix">
-                                    <img className="avatar"
-                                         src={key.value.avatarUrl}
-                                         alt="avatar"/>
-                                    <div className="about">
-                                        <div className="name">{key.value.displayName}</div>
-                                        <div className={key.status}>
-                                            <i className="fa fa-circle online"/> {key.status}
+                            <div key={key.key}>
+                                <button
+                                    className="button-list"
+                                    onClick={() => this.selectToChat(key)}>
+                                    <li className="clearfix">
+                                        <img className="avatar"
+                                             src={key.value.avatarUrl}
+                                             alt="avatar"/>
+                                        <div className="about">
+                                            <div className="name">{key.value.displayName}</div>
+                                            <div className={key.status}>
+                                                <i className="fa fa-circle online"/> {key.status}
+                                            </div>
                                         </div>
-                                    </div>
-                                </li>
-                            </button>
+                                    </li>
+                                </button>
+                                <img className="image-star"
+                                     src={(key.star) ? require("../../image/Star Filled.png"): require("../../image/Star.png")}
+                                     alt="star"
+                                     onClick={()=>this.star(id)}
+                                />
+                            </div>
                         )
                     )
                 );
             }
         }
 
-
         if(this.state.chatWith !== null) {
+            // tao thong tin nguoi chat
             chatWith= <div className="chat-header clearfix">
                 <img className="avatar"
                      src={this.state.chatWith.value.avatarUrl}
@@ -208,6 +295,7 @@ class Homepage extends Component {
                 }
             }
 
+            //tao history message
             for(let i = (message_id.length>50) ? message_id.length-50: 0; i < message_id.length; i++) {
                 if(historymessage.length >= 50) break;
                 const timestamp = this.props.messages[stt_message].value[message_id[i]].createdAt;
@@ -291,7 +379,6 @@ class Homepage extends Component {
                                     </div>:
                                     <div className="chat-message clearfix">  </div>
                             }
-
                     </div>
                 </div>
             </div>
@@ -301,7 +388,7 @@ class Homepage extends Component {
 
 export default compose(
     firebaseConnect([
-        'presence',  'users', 'messages'
+        'presence',  'users', 'messages', 'star'
     ]),
     connect(({ firebase: { auth } }) => ({ auth })),
     connect((state) => ({
@@ -309,6 +396,7 @@ export default compose(
         presence: state.firebase.ordered.presence,// profile: state.firebase.profile // load profile
         users: state.firebase.ordered.users,
         messages: state.firebase.ordered.messages,
+        star: state.firebase.ordered.star,
     })),
     connect(mapStateToProps),
 )(Homepage)

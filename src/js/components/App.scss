@@ -48,6 +48,14 @@ body {
     border-radius: 55px;
     margin-right: 5px;
 }
+
+.image-star {
+    float: left;
+    width: 16px;
+    height: 16px;
+}
+
+
 .people-list {
     width:260px;
     float: left;
@@ -62,10 +70,21 @@ body {
     }
 
     .button-list {
+        float: left;
         width: 200px;
         background: #444753;
         border: none;
         color: white;
+    }
+
+    .button-star {
+        width: 10px;
+        float: left;
+        background: #444753;
+        border: none;
+        :focus {
+            border: none;
+        }
     }
 
     input {
